@@ -1,13 +1,18 @@
-using System;
 using JetBrains.Annotations;
 using TLP.UdonUtils;
 using TLP.UdonUtils.Extensions;
+using TLP.UdonUtils.Sources;
 using UdonSharp;
 using UnityEngine;
+using UnityEngine.Serialization;
+using VRC.SDKBase;
 using VRC.Udon;
 
 namespace TLP.UdonUiAnimators.Runtime
 {
+    /// <summary>
+    /// Custom Animator that runs entirely in U# and only executes when needed.
+    /// </summary>
     [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
     [DefaultExecutionOrder(ExecutionOrder)]
     public abstract class TlpAnimator : TlpBaseBehaviour
@@ -18,74 +23,76 @@ namespace TLP.UdonUiAnimators.Runtime
         public new const int ExecutionOrder = TlpExecutionOrder.UiEnd;
 
         #region Monobehaviour
-
-        private void OnEnable()
-        {
+        private void OnEnable() {
 #if TLP_DEBUG
             DebugLog(nameof(OnEnable));
 #endif
+            if (!Utilities.IsValid(TimeSource)) {
+                ErrorAndDisableGameObject($"{nameof(TimeSource)} is not set");
+                return;
+            }
 
-            if (playOnEnable)
-            {
+            if (PlayOnEnable) {
                 Play();
             }
-            else
-            {
-                Pause();
-            }
         }
-
         #endregion
 
         #region Public API
-
+        [FormerlySerializedAs("loop")]
         [PublicAPI]
-        public bool loop;
+        public bool Loop;
 
+        [FormerlySerializedAs("playOnEnable")]
         [PublicAPI]
-        public bool playOnEnable = true;
+        public bool PlayOnEnable = true;
 
+        [FormerlySerializedAs("activateGameObjectOnPlay")]
         [PublicAPI]
-        public bool activateGameObjectOnPlay;
+        public bool ActivateGameObjectOnPlay;
 
+        [FormerlySerializedAs("deactivateGameObjectOnPause")]
         [PublicAPI]
-        public bool deactivateGameObjectOnPause;
+        public bool DeactivateGameObjectOnPause;
 
+        [FormerlySerializedAs("deactivateGameObjectOnStop")]
         [PublicAPI]
-        public bool deactivateGameObjectOnStop;
+        public bool DeactivateGameObjectOnStop;
+
+        [FormerlySerializedAs("animationCurve")]
+        [SerializeField]
+        internal AnimationCurve AnimationCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
 
         [SerializeField]
-        internal AnimationCurve animationCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
+        protected internal TimeSource TimeSource;
 
         [PublicAPI]
         public float NormalizedTime
         {
-            get => Mathf.Clamp01(UdonMath.Remap(startTime, endTime, 0, 1, m_CurrentTime));
+            get => Mathf.Clamp01(UdonMath.Remap(StartTime, EndTime, 0, 1, m_CurrentTime));
             set =>
-                m_CurrentTime = Mathf.Clamp(
-                    UdonMath.Remap(0, 1, startTime, endTime, value),
-                    startTime,
-                    endTime
-                );
+                    m_CurrentTime = Mathf.Clamp(
+                            UdonMath.Remap(0, 1, StartTime, EndTime, value),
+                            StartTime,
+                            EndTime
+                    );
         }
 
 
         [PublicAPI]
-        public virtual void Play()
-        {
+        public virtual void Play() {
 #if TLP_DEBUG
             DebugLog(nameof(Play));
 #endif
-            animationCurve.preWrapMode = WrapMode.ClampForever;
-            animationCurve.postWrapMode = WrapMode.ClampForever;
+            AnimationCurve.preWrapMode = WrapMode.ClampForever;
+            AnimationCurve.postWrapMode = WrapMode.ClampForever;
 
 #if !COMPILER_UDONSHARP
             UpdateInternalTime();
 #endif
 
             enabled = true;
-            if (activateGameObjectOnPlay)
-            {
+            if (ActivateGameObjectOnPlay) {
                 gameObject.SetActive(true);
             }
 
@@ -93,97 +100,74 @@ namespace TLP.UdonUiAnimators.Runtime
         }
 
         [PublicAPI]
-        public void Pause()
-        {
+        public void Pause() {
 #if TLP_DEBUG
             DebugLog(nameof(Pause));
 #endif
             enabled = false;
-            if (deactivateGameObjectOnPause)
-            {
+            if (DeactivateGameObjectOnPause) {
                 gameObject.SetActive(false);
             }
         }
 
 
         [PublicAPI]
-        public void Restart()
-        {
+        public void Restart() {
 #if TLP_DEBUG
             DebugLog(nameof(Restart));
 #endif
-            m_CurrentTime = startTime;
+            m_CurrentTime = StartTime;
             Play();
         }
 
         [PublicAPI]
-        public virtual void Stop()
-        {
+        public virtual void Stop() {
 #if TLP_DEBUG
             DebugLog(nameof(Stop));
 #endif
-            m_CurrentTime = startTime;
+            m_CurrentTime = StartTime;
             enabled = false;
 
-            if (deactivateGameObjectOnStop)
-            {
+            if (DeactivateGameObjectOnStop) {
                 gameObject.SetActive(false);
             }
         }
-
         #endregion
 
         #region UdonSharpBehaviour
-
-        public override void PostLateUpdate()
-        {
+        public override void PostLateUpdate() {
 #if TLP_DEBUG
             DebugLog(nameof(PostLateUpdate));
 #endif
-            UpdateAnimation(Time.deltaTime);
+            UpdateAnimation(TimeSource.DeltaTime());
         }
 
-        private void UpdateAnimation(float deltaTime)
-        {
-            _lastUpdate = Time.frameCount;
+        private void UpdateAnimation(float deltaTime) {
+            m_CurrentTime = Mathf.Max(m_CurrentTime, StartTime) + deltaTime;
 
-            m_CurrentTime = Mathf.Max(m_CurrentTime, startTime) + deltaTime;
-
-            if (m_CurrentTime < endTime)
-            {
-                Animate(animationCurve.Evaluate(m_CurrentTime));
-            }
-            else if (loop)
-            {
-                m_CurrentTime = startTime + (m_CurrentTime - endTime);
-                Animate(animationCurve.Evaluate(m_CurrentTime));
-            }
-            else
-            {
+            if (m_CurrentTime < EndTime) {
+                Animate(AnimationCurve.Evaluate(m_CurrentTime));
+            } else if (Loop) {
+                m_CurrentTime = StartTime + (m_CurrentTime - EndTime);
+                Animate(AnimationCurve.Evaluate(m_CurrentTime));
+            } else {
                 AnimationEnd();
             }
         }
 
-        private void AnimationEnd()
-        {
-            Animate(animationCurve.Evaluate(endTime));
+        private void AnimationEnd() {
+            Animate(AnimationCurve.Evaluate(EndTime));
             Stop();
         }
-
         #endregion
 
         #region Hooks
-
         protected abstract void Animate(float value);
-
         #endregion
 
         #region Internal
-
-        public override void OnEvent(string eventName)
-        {
-            switch (eventName)
-            {
+        public override void OnEvent(string eventName) {
+            switch (eventName) {
                 case nameof(Play):
                     Play();
                     break;
@@ -202,40 +186,34 @@ namespace TLP.UdonUiAnimators.Runtime
             }
         }
 
+        [FormerlySerializedAs("startTime")]
         [SerializeField]
-        internal float startTime;
+        internal float StartTime;
 
+        [FormerlySerializedAs("endTime")]
         [SerializeField]
-        internal float endTime = 1;
+        internal float EndTime = 1;
 
         private float m_CurrentTime;
-        private int _lastUpdate;
-
 
 #if !COMPILER_UDONSHARP
         // TODO [] on AnimationCurves is not yet supported by U#
-        private void UpdateStartAndEnd()
-        {
-            if (animationCurve.length > 0)
-            {
-                startTime = animationCurve[0].time;
-                endTime = animationCurve[animationCurve.length - 1].time;
-            }
-            else
-            {
-                startTime = 0;
-                endTime = 0;
+        private void UpdateStartAndEnd() {
+            if (AnimationCurve.length > 0) {
+                StartTime = AnimationCurve[0].time;
+                EndTime = AnimationCurve[AnimationCurve.length - 1].time;
+            } else {
+                StartTime = 0;
+                EndTime = 0;
             }
         }
 
-        private void UpdateInternalTime()
-        {
+        private void UpdateInternalTime() {
             float currentTime = NormalizedTime;
             UpdateStartAndEnd();
             NormalizedTime = currentTime;
         }
 #endif
-
         #endregion
     }
 }

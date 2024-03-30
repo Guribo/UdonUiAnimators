@@ -30,10 +30,8 @@ namespace TLP.UdonUiAnimators.Runtime
         [SerializeField]
         private Color MaxColor;
 
-        protected override void Animate(float value)
-        {
-            if (!Utilities.IsValid(Image))
-            {
+        protected override void Animate(float value) {
+            if (!Utilities.IsValid(Image)) {
                 Error($"{nameof(Image)} invalid");
                 Pause();
                 return;

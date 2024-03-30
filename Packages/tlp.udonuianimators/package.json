@@ -1,7 +1,7 @@
 {
   "name": "tlp.udonuianimators",
   "displayName": "TLP UdonUiAnimators",
-  "version": "1.0.0",
+  "version": "1.1.0-rc.1",
   "description": "Extendable, programmable animator system that does not rely on Unity Animators.",
   "gitDependencies": {},
   "author": {
@@ -9,8 +9,8 @@
     "url": "https://github.com/Guribo"
   },
   "vpmDependencies": {
-    "com.vrchat.udonsharp": "^1.1.x",
-    "tlp.udonutils": "^1.0.x"
+    "com.vrchat.worlds": "^3.5.x",
+    "tlp.udonutils": "^3.0.x"
   },
-  "unity": "2019.4"
+  "unity": "2022.3"
 }
