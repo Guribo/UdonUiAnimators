@@ -9,7 +9,24 @@ Install via VRChat Creator companion using my [VPM Listing](https://guribo.githu
 
 All notable changes to this project will be documented in this file.
 
-### [1.1.0-rc.1] - 2024-03-30
+### [1.1.0] - 2024-03-30
+
+#### 🚀 Features
+
+- Update assembly definitions after vrc sdk updates
+- Update to Unity 2022.3
+- Migrate to UdonUtils 3.0.0
+
+#### 🐛 Bug Fixes
+
+- Pause behavior
+
+#### ⚙️ Miscellaneous Tasks
+
+- Fix release target branch
+- Bump version
+
+### [1.0.0] - 2023-09-13
 
 #### 🚀 Features
 
@@ -27,13 +44,6 @@ All notable changes to this project will be documented in this file.
 - Update namespaces
 - Update assets
 - Convert to package structure
-- Update assembly definitions after vrc sdk updates
-- Update to Unity 2022.3
-- Migrate to UdonUtils 3.0.0
-
-#### 🐛 Bug Fixes
-
-- Pause behavior
 
 #### 🧪 Testing
 
