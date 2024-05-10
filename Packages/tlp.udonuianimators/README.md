@@ -9,6 +9,12 @@ Install via VRChat Creator companion using my [VPM Listing](https://guribo.githu
 
 All notable changes to this project will be documented in this file.
 
+### [1.2.0] - 2024-05-10
+
+#### 🚀 Features
+
+- Migrate to UdonUtils 6.1, com.vrchat.worlds 3.6.x as well as Unity 2022.3.22
+
 ### [1.1.0] - 2024-03-30
 
 #### 🚀 Features

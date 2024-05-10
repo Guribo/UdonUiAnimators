@@ -42,12 +42,8 @@ namespace TLP.UdonUiAnimators.Runtime
         private float _startTime;
         private int _framesAboveTarget;
 
-        private void Start() {
-            #region TLP_DEBUG
-#if TLP_DEBUG
-            DebugLog(nameof(Start));
-#endif
-            #endregion
+        public override void Start() {
+            base.Start();
 
             if (!TlpAnimator) {
                 ErrorAndDisableGameObject($"{nameof(TlpAnimator)} not set");
