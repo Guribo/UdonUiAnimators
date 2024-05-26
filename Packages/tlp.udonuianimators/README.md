@@ -9,6 +9,12 @@ Install via VRChat Creator companion using my [VPM Listing](https://guribo.githu
 
 All notable changes to this project will be documented in this file.
 
+### [1.2.1] - 2024-05-26
+
+#### ⚙️ Miscellaneous Tasks
+
+- Migrate to UdonUtils 8.1
+
 ### [1.2.0] - 2024-05-10
 
 #### 🚀 Features

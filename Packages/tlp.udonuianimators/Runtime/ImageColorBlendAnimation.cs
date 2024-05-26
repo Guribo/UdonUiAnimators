@@ -1,11 +1,10 @@
 ﻿using JetBrains.Annotations;
-using TLP.UdonUtils;
+using TLP.UdonUtils.Runtime;
 using UdonSharp;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 using VRC.SDKBase;
-using VRC.Udon;
 
 namespace TLP.UdonUiAnimators.Runtime
 {

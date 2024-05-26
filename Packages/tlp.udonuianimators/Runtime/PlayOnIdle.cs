@@ -1,6 +1,6 @@
 ﻿using JetBrains.Annotations;
-using TLP.UdonUtils;
-using TLP.UdonUtils.Sources;
+using TLP.UdonUtils.Runtime;
+using TLP.UdonUtils.Runtime.Sources;
 using UdonSharp;
 using UnityEngine;
 
