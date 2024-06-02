@@ -1,7 +1,7 @@
 {
   "name": "tlp.udonuianimators",
   "displayName": "TLP UdonUiAnimators",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Extendable, programmable animator system that does not rely on Unity Animators.",
   "gitDependencies": {},
   "author": {
@@ -10,7 +10,7 @@
   },
   "vpmDependencies": {
     "com.vrchat.worlds": "3.6.x",
-    "tlp.udonutils": "8.1.x"
+    "tlp.udonutils": "8.2.x"
   },
   "unity": "2022.3"
 }
