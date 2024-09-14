@@ -1,13 +1,45 @@
 # UdonUiAnimators
 
+[![Total downloads](https://img.shields.io/github/downloads/Guribo/UdonUiAnimators/total?style=flat-square&logo=appveyor)](https://github.com/Guribo/UdonUiAnimators/releases)
+
 Extendable, programmable animator system that does not rely on Unity Animators.
 
-Install via VRChat Creator companion using my [VPM Listing](https://guribo.github.io/TLP/).
+## Installation
+
+1. Install/Add VRChat World SDK 3.7 to your project
+2. Install/Add CyanPlayerObjectPool to your project: https://cyanlaser.github.io/CyanPlayerObjectPool/
+3. Install/Add TLP UdonUiAnimators to your project: https://guribo.github.io/TLP/
+
+## Setup
+
+1. Add `TLP_Essentials` prefab to your scene to get the core components
+   1. TLPLogger - *for logging anything TLP related*
+   2. WorldVersionCheck - *Warns users if a player with a new world version joins*
+   3. TLPNetworkTime - *Much more accurate VRC network time provider (sub-millisecond accuracy)*
+
+## Versioning
+
+This package is versioned using [Semantic Version](https://semver.org/).
+
+The used pattern MAJOR.MINOR.PATCH indicates: 
+
+1. MAJOR version: incompatible API changes occurred
+   - Implication: after updating backup, check and update your scenes/scripts as needed
+2. MINOR version: new functionality has been added in a backward compatible manner
+   - Implication: after updating check and update your usages if needed
+3. PATCH version: backward compatible bug fixes were implemented
+   - Implication: after updating remove potential workarounds you added
 
 
 ## Changelog
 
 All notable changes to this project will be documented in this file.
+
+### [1.3.0] - 2024-09-14
+
+#### 🚀 Features
+
+- Support UdonUtils 9.0, update Readme
 
 ### [1.2.2] - 2024-06-02
 
