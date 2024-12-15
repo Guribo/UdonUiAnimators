@@ -35,6 +35,12 @@ The used pattern MAJOR.MINOR.PATCH indicates:
 
 All notable changes to this project will be documented in this file.
 
+### [1.4.0] - 2024-12-15
+
+#### 🚀 Features
+
+- Deterministic execution order
+
 ### [1.3.0] - 2024-09-14
 
 #### 🚀 Features

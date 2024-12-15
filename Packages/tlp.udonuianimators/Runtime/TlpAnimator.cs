@@ -14,20 +14,23 @@ namespace TLP.UdonUiAnimators.Runtime
     /// </summary>
     [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
     [DefaultExecutionOrder(ExecutionOrder)]
+    [TlpDefaultExecutionOrder(typeof(TlpAnimator), ExecutionOrder)]
     public abstract class TlpAnimator : TlpBaseBehaviour
     {
-        protected override int ExecutionOrderReadOnly => ExecutionOrder;
+        #region ExecutionOrder
+        public override int ExecutionOrderReadOnly => ExecutionOrder;
 
         [PublicAPI]
-        public new const int ExecutionOrder = TlpExecutionOrder.UiEnd;
+        public new const int ExecutionOrder = TlpExecutionOrder.UiStart + 900;
+        #endregion
 
         #region Monobehaviour
         private void OnEnable() {
 #if TLP_DEBUG
             DebugLog(nameof(OnEnable));
 #endif
-            if (!Utilities.IsValid(TimeSource)) {
-                ErrorAndDisableGameObject($"{nameof(TimeSource)} is not set");
+            if (!HasStartedOk) {
+                ErrorAndDisableGameObject($"{nameof(OnEnable)}: Not initialized");
                 return;
             }
 
@@ -36,6 +39,20 @@ namespace TLP.UdonUiAnimators.Runtime
             }
         }
         #endregion
+
+        protected override bool SetupAndValidate() {
+            if (!base.SetupAndValidate()) {
+                return false;
+            }
+
+            if (!Utilities.IsValid(TimeSource)) {
+                Error($"{nameof(SetupAndValidate)}: {nameof(TimeSource)} is not set");
+                return false;
+            }
+
+            return true;
+        }
+
 
         #region Public API
         [FormerlySerializedAs("loop")]
@@ -69,15 +86,25 @@ namespace TLP.UdonUiAnimators.Runtime
         public float NormalizedTime
         {
             get => Mathf.Clamp01(UdonMath.Remap(StartTime, EndTime, 0, 1, m_CurrentTime));
-            set =>
-                    m_CurrentTime = Mathf.Clamp(
-                            UdonMath.Remap(0, 1, StartTime, EndTime, value),
-                            StartTime,
-                            EndTime
-                    );
+            set
+            {
+                m_CurrentTime = Mathf.Clamp(
+                        UdonMath.Remap(0, 1, StartTime, EndTime, value),
+                        StartTime,
+                        EndTime
+                );
+                m_CurrentTime = Mathf.Lerp(StartTime, EndTime, value);
+
+                if (enabled) {
+                    UpdateAnimation(0);
+                }
+            }
         }
 
 
+        /// <summary>
+        /// Continues playing from current position
+        /// </summary>
         [PublicAPI]
         public virtual void Play() {
 #if TLP_DEBUG
@@ -161,6 +188,7 @@ namespace TLP.UdonUiAnimators.Runtime
         #endregion
 
         #region Hooks
+        /// <param name="value">value from the animation curve at the current time</param>
         protected abstract void Animate(float value);
         #endregion
 

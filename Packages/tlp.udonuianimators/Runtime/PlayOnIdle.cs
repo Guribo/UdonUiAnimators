@@ -3,6 +3,7 @@ using TLP.UdonUtils.Runtime;
 using TLP.UdonUtils.Runtime.Sources;
 using UdonSharp;
 using UnityEngine;
+using VRC.SDKBase;
 
 namespace TLP.UdonUiAnimators.Runtime
 {
@@ -14,12 +15,15 @@ namespace TLP.UdonUiAnimators.Runtime
     /// </summary>
     [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
     [DefaultExecutionOrder(ExecutionOrder)]
+    [TlpDefaultExecutionOrder(typeof(PlayOnIdle), ExecutionOrder)]
     public class PlayOnIdle : TlpBaseBehaviour
     {
-        protected override int ExecutionOrderReadOnly => ExecutionOrder;
+        #region ExecutionOrder
+        public override int ExecutionOrderReadOnly => ExecutionOrder;
 
         [PublicAPI]
-        private new const int ExecutionOrder = TlpExecutionOrder.UiStart;
+        public new const int ExecutionOrder = TlpAnimator.ExecutionOrder + 2;
+        #endregion
 
         [SerializeField]
         [Range(0f, 30f)]
@@ -42,12 +46,14 @@ namespace TLP.UdonUiAnimators.Runtime
         private float _startTime;
         private int _framesAboveTarget;
 
-        public override void Start() {
-            base.Start();
+        protected override bool SetupAndValidate() {
+            if (!base.SetupAndValidate()) {
+                return false;
+            }
 
-            if (!TlpAnimator) {
-                ErrorAndDisableGameObject($"{nameof(TlpAnimator)} not set");
-                return;
+            if (!Utilities.IsValid(TlpAnimator)) {
+                Error($"{nameof(TlpAnimator)} not set");
+                return false;
             }
 
             _startTime = TimeSource.Time();
@@ -55,6 +61,7 @@ namespace TLP.UdonUiAnimators.Runtime
             // ensure that the animation has played the first frame and remains paused until started
             TlpAnimator.Restart();
             TlpAnimator.Pause();
+            return true;
         }
 
         private void Update() {

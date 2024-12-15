@@ -1,5 +1,4 @@
 ﻿using JetBrains.Annotations;
-using TLP.UdonUtils.Runtime;
 using UdonSharp;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -10,12 +9,15 @@ namespace TLP.UdonUiAnimators.Runtime
 {
     [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
     [DefaultExecutionOrder(ExecutionOrder)]
+    [TlpDefaultExecutionOrder(typeof(ImageColorBlendAnimation), ExecutionOrder)]
     public class ImageColorBlendAnimation : TlpAnimator
     {
-        protected override int ExecutionOrderReadOnly => ExecutionOrder;
+        #region ExecutionOrder
+        public override int ExecutionOrderReadOnly => ExecutionOrder;
 
         [PublicAPI]
-        public new const int ExecutionOrder = TlpExecutionOrder.UiEnd;
+        public new const int ExecutionOrder = PlayOnIdle.ExecutionOrder + 1;
+        #endregion
 
         [FormerlySerializedAs("image")]
         [SerializeField]
