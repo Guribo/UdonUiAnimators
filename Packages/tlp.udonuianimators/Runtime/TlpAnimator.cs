@@ -85,14 +85,9 @@ namespace TLP.UdonUiAnimators.Runtime
         [PublicAPI]
         public float NormalizedTime
         {
-            get => Mathf.Clamp01(UdonMath.Remap(StartTime, EndTime, 0, 1, m_CurrentTime));
+            get => Mathf.InverseLerp(StartTime, EndTime, m_CurrentTime);
             set
             {
-                m_CurrentTime = Mathf.Clamp(
-                        UdonMath.Remap(0, 1, StartTime, EndTime, value),
-                        StartTime,
-                        EndTime
-                );
                 m_CurrentTime = Mathf.Lerp(StartTime, EndTime, value);
 
                 if (enabled) {

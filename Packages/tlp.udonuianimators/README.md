@@ -35,6 +35,16 @@ The used pattern MAJOR.MINOR.PATCH indicates:
 
 All notable changes to this project will be documented in this file.
 
+### [1.4.1] - 2024-12-19
+
+#### 🚜 Refactor
+
+- Remove redundant code
+
+#### ⚙️ Miscellaneous Tasks
+
+- Bump version
+
 ### [1.4.0] - 2024-12-15
 
 #### 🚀 Features
